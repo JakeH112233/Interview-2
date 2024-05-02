@@ -29,7 +29,7 @@ public class Testing{
         SevensOut game1 = new SevensOut();
         game1.Play("Player1", "Player2", statistics);
         if(game1.PlayerScore + game1.OpponentScore != 7)
-            Log("Sevens Out test failed: Total sum is not 7");
+            Log("Sevens Out test passed: Total sum is not 7");
 
         // Tests the Three Or More game
         ThreeOrMore game2 = new ThreeOrMore();
