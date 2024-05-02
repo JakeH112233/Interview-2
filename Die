@@ -1,0 +1,9 @@
+using System;
+
+// Class to create a six-sided die
+public class Die{
+    private static Random random = new Random(); // Creates random feature
+
+    // Roll the die to generate a random number 1 - 6
+    public int Roll() => random.Next(1, 7);
+}

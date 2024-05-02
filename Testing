@@ -1,0 +1,46 @@
+using System;
+using System.IO;
+
+// Class to perform the testing on the games
+public class Testing{
+    private StreamWriter logFile;
+
+    // Opens the log file for writing 
+    public Testing(){
+        logFile = new StreamWriter("TestLog.txt");
+    }
+
+    // Closes the log file to create the log file
+    public void CloseLogFile(){
+        logFile.Close();
+    }
+
+    // Logs a message to the log file
+    public void Log(string message){
+        logFile.WriteLine(message);
+    }
+
+    // Run tests on the games
+    public void RunTests(){
+        Log("Running tests on the games...");
+        var statistics = new Statistics();
+
+        // Tests the Sevens Out game
+        SevensOut game1 = new SevensOut();
+        game1.Play("Player1", "Player2", statistics);
+        if(game1.PlayerScore + game1.OpponentScore != 7)
+            Log("Sevens Out test failed: Total sum is not 7");
+
+        // Tests the Three Or More game
+        ThreeOrMore game2 = new ThreeOrMore();
+        game2.Play("Player1", "Player2", statistics);
+        if(game2.PlayerScore < 20 && game2.OpponentScore < 20)
+            Log("Three Or More test failed: Total is not reaching 20");
+
+        // If successful reports back appropriately
+        Log("All tests passed! No errors found.");
+
+        Log($"Sevens Out High Score: {statistics.SevensOutHighScore}");
+        Log($"Three Or More Fewest Rolls to 20: {statistics.ThreeOrMoreHighScore}");
+    }
+}

@@ -1,0 +1,129 @@
+using System;
+
+// Main program Start
+public class Program{
+    static void Main(){
+        // Create statistics object to track the game statistics
+        Statistics stats = new Statistics();
+        Game game = null;
+
+        // Main menu loop until condition is met
+        while (true){
+            // Player input choice
+            Console.WriteLine("1. Play Sevens Out");
+            Console.WriteLine("2. Play Three Or More");
+            Console.WriteLine("3. View Statistics");
+            Console.WriteLine("4. Test The Games");
+            Console.WriteLine("5. Exit Application");
+            Console.Write("Choose an option from the ones above: ");
+            string option = Console.ReadLine();
+
+            switch (option){
+                // Starts sevens out
+                case "1":
+                    game = new SevensOut();
+                    PlayGame((SevensOut)game, stats);
+                    stats.UpdateSevensOutStats();
+                    break;
+                
+                // Starts three or more
+                case "2":
+                    game = new ThreeOrMore();
+                    PlayGame((ThreeOrMore)game, stats);
+                    stats.UpdateThreeOrMoreStats();
+                    break;
+                
+                // Displays the stats
+                case "3":
+                    Console.WriteLine($"Number Sevens Out Plays: {stats.SevensOutPlays}");
+                    Console.WriteLine($"Number Three Or More Plays: {stats.ThreeOrMorePlays}");
+                    Console.WriteLine($"Sevens Out High Score: {stats.SevensOutHighScore}");
+                    Console.WriteLine($"Three Or More Fewest Rolls to 20: {stats.ThreeOrMoreHighScore}");
+                    break;
+                
+                // Displays the tests in a log file
+                case "4":
+                    Testing testing = new Testing();
+                    testing.RunTests();
+                    testing.CloseLogFile();
+                    break;
+                
+                // Closes the program
+                case "5":
+                    return;
+                
+                // Reverts back to player input choice if invalid
+                default:
+                    Console.WriteLine("Invalid option, please try again!");
+                    break;
+            }
+        }
+    }
+
+    // Method to play Sevens Out game
+    static void PlayGame(SevensOut game, Statistics stats){
+        Console.Write("Enter your name here: ");
+        string playerName = Console.ReadLine();
+
+        // To enter the opponenets name
+        string opponentChoice;
+        string opponentName = "";
+
+        // Loops until a valid opponent choice is entered
+        while (true){
+            Console.Write("Input 'A' to play against a computer or 'B' to play against another player: ");
+            opponentChoice = Console.ReadLine().ToUpper();
+
+            if (opponentChoice == "A"){
+                Console.Write("Enter opponent's name: ");
+                opponentName = Console.ReadLine();
+                break; // Exit the loop if a player opponent is chosen
+            }
+            
+            else if (opponentChoice == "B"){
+                opponentName = "Computer";
+                break; // Exit the loop if a computer opponent is chosen
+            }
+            
+            else{
+                Console.WriteLine("Invalid choice! Please enter 'A' or 'B'.");
+            }
+        }
+
+        // Start the sevens out game
+        game.Play(playerName, opponentName, stats);
+    }
+
+    // Method to play Three Or More game
+    static void PlayGame(ThreeOrMore game, Statistics stats){
+        Console.Write("Enter your name here: ");
+        string playerName = Console.ReadLine();
+
+        string opponentChoice;
+        string opponentName = "";
+
+        // Loops until a valid opponent choice is entered
+        while (true){
+            Console.Write("Input 'A' to play against a computer or 'B' to play against another player: ");
+            opponentChoice = Console.ReadLine().ToUpper();
+
+            if (opponentChoice == "P"){
+                Console.Write("Enter opponent's name: ");
+                opponentName = Console.ReadLine();
+                break; // Exit the loop if a player opponent is chosen
+            }
+            
+            else if (opponentChoice == "C"){
+                opponentName = "Computer";
+                break; // Exit the loop if a computer opponent is chosen
+            }
+            
+            else{
+                Console.WriteLine("Invalid choice! Please enter 'A' or 'B'.");
+            }
+        }
+
+        // Start the three or more game
+        game.Play(playerName, opponentName, stats);
+    }
+}

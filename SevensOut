@@ -1,0 +1,66 @@
+using System;
+
+// start of the Sevens Out game
+public class SevensOut : Game{
+    // Generates 2 dice to be rolled
+    private Die die1 = new Die();
+    private Die die2 = new Die();
+
+    // The player and opponent scores
+    public int PlayerScore { get; private set; } = 0;
+    public int OpponentScore { get; private set; } = 0;
+
+    // Method to play the Sevens Out game
+    public override void Play(string playerName, string opponentName, Statistics stats){
+        while (true){
+            // Player's turn to roll the dice
+            int roll1 = die1.Roll();
+            int roll2 = die2.Roll();
+            int sum = roll1 + roll2;
+            Console.WriteLine($"{playerName} rolled: {roll1} + {roll2} = {sum}");
+
+            // Check if player has rolled a 7
+            if (sum == 7){
+                Console.WriteLine($"Rolled a 7! {playerName}");
+                OpponentScore = PlayerScore; // Both start on the same score
+                break;
+            }
+            else{
+                PlayerScore += sum; // Calculates the players score after each turn
+                Console.WriteLine($"Added {sum} to {playerName}'s total. {playerName}'s current score: {PlayerScore}");
+            }
+
+            // Switch to opponent's turn to roll the dice
+            Console.WriteLine($"{opponentName}'s turn to roll the dice...");
+            roll1 = die1.Roll();
+            roll2 = die2.Roll();
+            
+            sum = roll1 + roll2;
+            Console.WriteLine($"{opponentName} rolled: {roll1} + {roll2} = {sum}");
+
+            // Check if the opponent rolled a 7
+            if (sum == 7){
+                Console.WriteLine($"{opponentName} rolled a 7! {playerName}");
+                break;
+            }
+            else{
+                OpponentScore += sum;// Calculates the players score after each turn
+                Console.WriteLine($"Added {sum} to {opponentName}'s total. {opponentName}'s current score: {OpponentScore}");
+            }
+        }
+
+        // Displays the final scores and decides who is the winner
+        Console.WriteLine($"{playerName}'s final score: {PlayerScore}");
+        Console.WriteLine($"{opponentName}'s final score: {OpponentScore}");
+        
+        if (PlayerScore > OpponentScore)
+            Console.WriteLine($"{playerName} wins!");
+        else if (OpponentScore > PlayerScore)
+            Console.WriteLine($"{opponentName} wins!");
+        else
+            Console.WriteLine("It's a tie! No one wins.");
+
+        // Updates the highscore in the stats 
+        stats.UpdateSevensOutHighScore(PlayerScore);
+    }
+}

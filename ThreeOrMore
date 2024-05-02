@@ -1,0 +1,167 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// Represents the Three Or More game
+public class ThreeOrMore : Game{
+    // Creates 5 dice to be rolled
+    private Die[] dice = new Die[5];
+    // The player and the opponent scores, and number of rolls to reach 20
+    public int PlayerScore { get; private set; } = 0;
+    public int OpponentScore { get; private set; } = 0;
+    public int NumOfRollsTo20 { get; private set; } = int.MaxValue;
+
+    // Initializes the dice to be rolled
+    public ThreeOrMore(){
+        for (int i = 0; i < 5; i++)
+            dice[i] = new Die();
+    }
+
+    // Method to play Three Or More game
+    public override void Play(string playerName, string opponentName, Statistics stats){
+        int rolls = 0;
+
+        // Continue playing until either player reaches a score of 20 or more
+        while (PlayerScore < 20 && OpponentScore < 20){
+            // Player's turn to roll all the dice
+            var playerRolls = RollAllDice();
+            Console.WriteLine($"{playerName} rolled: " + string.Join(", ", playerRolls));
+
+            // Updates how many rolls the player has had each time
+            rolls++;
+            var groups = playerRolls.GroupBy(x => x).ToDictionary(y => y.Key, y => y.Count());
+            var maxCount = groups.Max(y => y.Value);
+            
+            // Checks the dice for three or more of a kind
+            if (maxCount >= 3){
+                int points = maxCount == 3 ? 3 : (maxCount == 4 ? 6 : 12);
+                PlayerScore += points;
+                Console.WriteLine($"{maxCount}-of-a-kind! {playerName} just gained {points} points to their total!");
+            }
+            else if (maxCount == 2){
+                int rerollOption = ChooseRerollOption(playerName);
+                
+                // Player chooses to reroll either all dice or the non-matching dice
+                if (rerollOption == 1){
+                    playerRolls = RollAllDice();
+                    Console.WriteLine($"{playerName} re-rolled all dice: " + string.Join(", ", playerRolls));
+                }
+                else{
+                    playerRolls = RollNonMatchingDice(playerRolls);
+                    Console.WriteLine($"{playerName} re-rolled non-matching dice: " + string.Join(", ", playerRolls));
+                }
+
+                // Re-evaluate rolls after the re-roll
+                groups = playerRolls.GroupBy(x => x).ToDictionary(y => y.Key, y => y.Count());
+                maxCount = groups.Max(y => y.Value);
+                
+                // Check for three or more of a kind after the re-roll
+                if (maxCount >= 3){
+                    int points = maxCount == 3 ? 3 : (maxCount == 4 ? 6 : 12);
+                    PlayerScore += points;
+                    Console.WriteLine($"{maxCount}-of-a-kind after re-roll! {playerName} just gained {points} points to their total!");
+                }
+                else{
+                    Console.WriteLine("No matching numbers after re-roll. Score remains 0!");
+                }
+            }
+            else{
+                Console.WriteLine("No matching numbers. Score remains 0!");
+            }
+            
+            Console.WriteLine($"{playerName}'s current score: {PlayerScore}");
+
+            // Opponent's turn to roll the dice
+            if (PlayerScore < 20){
+                Console.WriteLine($"{opponentName}'s turn to roll the dice...");
+                var opponentRolls = RollAllDice();
+                Console.WriteLine($"{opponentName} rolled: " + string.Join(", ", opponentRolls));
+
+                rolls++;
+                var opponentGroups = opponentRolls.GroupBy(x => x).ToDictionary(y => y.Key, y => y.Count());
+                var opponentMaxCount = opponentGroups.Max(y => y.Value);
+                
+                // Check for three or more of a kind for the opponent
+                if (opponentMaxCount >= 3){
+                    int points = opponentMaxCount == 3 ? 3 : (opponentMaxCount == 4 ? 6 : 12);
+                    OpponentScore += points;
+                    Console.WriteLine($"{opponentMaxCount}-of-a-kind! {opponentName} just gained {points} points to their total!");
+                }
+                else if (opponentMaxCount == 2){
+                    opponentRolls = RollNonMatchingDice(opponentRolls);
+                    Console.WriteLine($"{opponentName} re-rolled non-matching dice: " + string.Join(", ", opponentRolls));
+
+                    // Re-evaluate rolls after the re-roll
+                    opponentGroups = opponentRolls.GroupBy(x => x).ToDictionary(y => y.Key, y => y.Count());
+                    opponentMaxCount = opponentGroups.Max(y => y.Value);
+                    
+                    // Check for three or more of a kind after the re-roll
+                    if (opponentMaxCount >= 3){
+                        int points = opponentMaxCount == 3 ? 3 : (opponentMaxCount == 4 ? 6 : 12);
+                        OpponentScore += points;
+                        Console.WriteLine($"{opponentMaxCount}-of-a-kind after re-roll! {opponentName} just gained {points} points to their total!");
+                    }
+                    else{
+                        Console.WriteLine("No matching numbers after re-roll. Score remains 0!");
+                    }
+                }
+                else{
+                    Console.WriteLine("No matching numbers. Score remains 0!");
+                }
+
+                Console.WriteLine($"{opponentName}'s current score: {OpponentScore}");
+            }
+        }
+
+        // Update the fewest rolls to reach 20
+        if (rolls < NumOfRollsTo20)
+            NumOfRollsTo20 = rolls;
+
+        // Determine the winner and update highscore inside of the stats
+        if (PlayerScore >= 20 && OpponentScore >= 20)
+            Console.WriteLine("It's a tie! No one wins.");
+        else if (PlayerScore >= 20)
+            Console.WriteLine($"{playerName} reached 20 or more first! {playerName} wins!");
+        else if (OpponentScore >= 20)
+            Console.WriteLine($"{opponentName} reached 20 or more first! {opponentName} wins!");
+
+        stats.UpdateThreeOrMoreHighScore(NumOfRollsTo20);
+    }
+
+    // Roll all of the dice
+    private List<int> RollAllDice(){
+        return dice.Select(d => d.Roll()).ToList();
+    }
+
+    // Prompts the player to choose a reroll option
+    private int ChooseRerollOption(string playerName){
+        while (true){
+            Console.WriteLine($"{playerName}, choose your re-roll option from the ones below:");
+            Console.WriteLine("1. Re-roll all dice");
+            Console.WriteLine("2. Re-roll non-matching dice");
+            Console.Write("Enter your choice here: ");
+            
+            // Parse to turn string into integer through the choice
+            if (int.TryParse(Console.ReadLine(), out int choice) && (choice == 1 || choice == 2)){
+                return choice;
+            }
+            else{
+                Console.WriteLine("Invalid choice! Please enter 1 or 2.");
+            }
+        }
+    }
+
+    // Roll the non-matching dice
+    private List<int> RollNonMatchingDice(List<int> currentRolls){
+        var groups = currentRolls.GroupBy(x => x).ToDictionary(y => y.Key, y => y.Count());
+        var maxCount = groups.Max(y => y.Value);
+        var nonMatchingDice = currentRolls.Where(d => groups[d] != maxCount).ToList();
+        var newRolls = new List<int>();
+        
+        foreach (var die in nonMatchingDice){
+            newRolls.Add(new Die().Roll());
+        }
+        
+        return newRolls;
+    }
+}

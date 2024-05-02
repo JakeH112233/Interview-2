@@ -1,0 +1,26 @@
+// Represents statistics for the games to be viewed
+public class Statistics{
+    // The Number of Sevens Out plays and Three Or More plays
+    public int SevensOutPlays { get; private set; }
+    public int ThreeOrMorePlays { get; private set; }
+    // High scores for Sevens Out and Three Or More
+    public int SevensOutHighScore { get; private set; } = 0;
+    public int ThreeOrMoreHighScore { get; private set; } = 0; 
+
+    // Update the Sevens Out play count
+    public void UpdateSevensOutStats() => SevensOutPlays++;
+    // Update the Three Or More play count
+    public void UpdateThreeOrMoreStats() => ThreeOrMorePlays++;
+
+    // Update the Sevens Out high score
+    public void UpdateSevensOutHighScore(int score){
+        if (score > SevensOutHighScore)
+            SevensOutHighScore = score;
+    }
+
+    // Update the Three Or More high score
+    public void UpdateThreeOrMoreHighScore(int turnsTo20){
+        if (turnsTo20 < ThreeOrMoreHighScore || ThreeOrMoreHighScore == 0) // Update if the new score is less than current or current is 0
+            ThreeOrMoreHighScore = turnsTo20;
+    }
+}
